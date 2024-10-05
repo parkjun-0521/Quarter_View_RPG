@@ -8,7 +8,7 @@ using static InputKeyManager;
 public class Player : PlayerController
 {
     public delegate void PlayerHandle();
-    public static event PlayerHandle OnMove, OnDash, OnAttack, OnHit, OnDead;
+    public static event PlayerHandle OnMove, OnDash, OnAttack, OnSkill, OnHit, OnDead;
 
     void Awake()
     {
@@ -24,6 +24,7 @@ public class Player : PlayerController
         OnMove += Move;
         OnDash += Dash;
         OnAttack += Attack;
+        OnSkill += Skill;
         OnHit += Hit;
         OnDead += Dead;
     }
@@ -33,6 +34,7 @@ public class Player : PlayerController
         OnMove -= Move;
         OnDash -= Dash;
         OnAttack -= Attack;
+        OnSkill -= Skill;
         OnHit -= Hit;
         OnDead -= Dead;
     }
@@ -45,7 +47,7 @@ public class Player : PlayerController
         playerPower = 100;                   
         playerArmor = 100;      
         
-        Debug.Log(playerHP + "  " + playerMP + "  " + playerPower + "  " + playerArmor);
+        Debug.Log(PlayerHP + "  " + playerMP + "  " + playerPower + "  " + playerArmor);
     }
 
     void Update()
@@ -58,6 +60,14 @@ public class Player : PlayerController
         if(Input.GetKey(inputKeyManager.GetKeyCode(KeyCodeTypes.Attack)) && !isAttack && !animator.GetBool("IsDash")) {
             OnMove -= Move;
             OnAttack?.Invoke();
+        }
+
+        // 스킬 동작
+        OnSkill?.Invoke();
+
+        // 사망
+        if(PlayerHP <= 0) {
+            OnDead?.Invoke();
         }
     }
 
@@ -77,6 +87,11 @@ public class Player : PlayerController
         if(navAgent.isStopped == true) {
             animator.SetFloat("Speed", 0);
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+       
     }
 
     public override void Move()
@@ -171,13 +186,86 @@ public class Player : PlayerController
         comboCount = 0;
     }
 
-    /* public override void Hit()
-     {
+    public override void Skill()
+    {
+        if (Input.GetKey(inputKeyManager.GetKeyCode(KeyCodeTypes.Skill_1)) && !isSkill) {
+            isSkill = true;
+            Debug.Log("Q스킬 실행");
+            // 스킬 애니메이션 끝난 후 isSkill을 false로 변경하는 애니메이션 이벤트 추가 예정 
+            isSkill = false;
+        }
+        
+        if (Input.GetKey(inputKeyManager.GetKeyCode(KeyCodeTypes.Skill_2)) && !isSkill) {
+            isSkill = true;
+            Debug.Log("W스킬 실행");
+            // 스킬 애니메이션 끝난 후 isSkill을 false로 변경하는 애니메이션 이벤트 추가 예정 
+            isSkill = false;
+        }
+        
+        if (Input.GetKey(inputKeyManager.GetKeyCode(KeyCodeTypes.Skill_3)) && !isSkill) {
+            isSkill = true;
+            Debug.Log("E스킬 실행");
+            // 스킬 애니메이션 끝난 후 isSkill을 false로 변경하는 애니메이션 이벤트 추가 예정 
+            isSkill = false;
+        }
 
-     }
+        if (Input.GetKey(inputKeyManager.GetKeyCode(KeyCodeTypes.Skill_4)) && !isSkill) {
+            isSkill = true;
+            Debug.Log("R스킬 실행");
+            // 스킬 애니메이션 끝난 후 isSkill을 false로 변경하는 애니메이션 이벤트 추가 예정 
+            isSkill = false;
+        }
 
-     public override void Dead()
-     {
+        if (Input.GetKey(inputKeyManager.GetKeyCode(KeyCodeTypes.Skill_5)) && !isSkill) {
+            isSkill = true;
+            Debug.Log("A스킬 실행");
+            // 스킬 애니메이션 끝난 후 isSkill을 false로 변경하는 애니메이션 이벤트 추가 예정 
+            isSkill = false;
+        }
 
-     }*/
+        if (Input.GetKey(inputKeyManager.GetKeyCode(KeyCodeTypes.Skill_6)) && !isSkill) {
+            isSkill = true;
+            Debug.Log("S스킬 실행");
+            // 스킬 애니메이션 끝난 후 isSkill을 false로 변경하는 애니메이션 이벤트 추가 예정 
+            isSkill = false;
+        }
+
+        if (Input.GetKey(inputKeyManager.GetKeyCode(KeyCodeTypes.Skill_7)) && !isSkill) {
+            isSkill = true;
+            Debug.Log("D스킬 실행");
+            // 스킬 애니메이션 끝난 후 isSkill을 false로 변경하는 애니메이션 이벤트 추가 예정 
+            isSkill = false;
+        }
+
+        if (Input.GetKey(inputKeyManager.GetKeyCode(KeyCodeTypes.Skill_8)) && !isSkill) {
+            isSkill = true;
+            Debug.Log("F스킬 실행");
+            // 스킬 애니메이션 끝난 후 isSkill을 false로 변경하는 애니메이션 이벤트 추가 예정 
+            isSkill = false;
+        }
+
+        if (Input.GetKey(inputKeyManager.GetKeyCode(KeyCodeTypes.Skill_9)) && !isSkill) {
+            isSkill = true;
+            Debug.Log("V스킬 실행");
+            // 스킬 애니메이션 끝난 후 isSkill을 false로 변경하는 애니메이션 이벤트 추가 예정 
+            isSkill = false;
+        }
+    }
+
+    public override void Hit()
+    {
+
+    }
+
+    public override void Dead()
+    {
+        // 체력이 0보다 작을 때 사망
+        animator.SetTrigger("OnDead");
+        OnMove -= Move;
+        OnDash -= Dash;
+        OnAttack -= Attack;
+        OnSkill -= Skill;
+        OnHit -= Hit;
+        OnDead -= Dead;
+    }
 }

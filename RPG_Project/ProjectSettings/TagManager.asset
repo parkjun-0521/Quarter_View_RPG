@@ -8,6 +8,7 @@ TagManager:
   - FollowCamera
   - InputKeyManager
   - UI
+  - Enemy
   layers:
   - Default
   - TransparentFX

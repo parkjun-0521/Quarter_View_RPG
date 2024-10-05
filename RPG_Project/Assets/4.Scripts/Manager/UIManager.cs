@@ -40,10 +40,10 @@ public class UIManager : MonoBehaviour
 
         maxHP.text = "/ " + playerComponent.playerMaxHP.ToString("N0");
         maxMP.text = "/ " + playerComponent.playerMaxMP.ToString("N0");
-        curHP.text = playerComponent.playerHP.ToString("N0");
+        curHP.text = playerComponent.PlayerHP.ToString("N0");
         curMP.text = playerComponent.playerMP.ToString("N0");
 
-        HP.value = playerComponent.playerHP / playerComponent.playerMaxHP;
+        HP.value = playerComponent.PlayerHP / playerComponent.playerMaxHP;
         MP.value = playerComponent.playerMP / playerComponent.playerMaxMP;
     }
 }
