@@ -98,12 +98,9 @@ public class Player : PlayerController
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-
         if (Physics.Raycast(ray, out hit)) {
-            if(hit.collider.CompareTag("Ground")) {
-                navAgent.SetDestination(hit.point);
-                animator.SetFloat("Speed", 1);
-            }
+            navAgent.SetDestination(hit.point);
+            animator.SetFloat("Speed", 1);
         }
     }
 

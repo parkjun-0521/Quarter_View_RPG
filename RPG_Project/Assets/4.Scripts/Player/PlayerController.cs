@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class PlayerController : MonoBehaviour, IController
+public abstract class PlayerController : MonoBehaviour, IController
 {
     public float playerMaxHP;                   // 플레이어 최대 체력
     [SerializeField]
@@ -46,10 +46,10 @@ public class PlayerController : MonoBehaviour, IController
     public CapsuleCollider capsuleCollider;     // collider 컴포넌트 
     protected Animator animator;                // animator 컴포넌트
 
-    public virtual void Move() { }
+    public abstract void Move();
     public virtual void Dash() { }
-    public virtual void Attack() { }
+    public abstract void Attack();
     public virtual void Skill() { }
-    public virtual void Hit() { }
-    public virtual void Dead() { }
+    public abstract void Hit();
+    public abstract void Dead();
 }
