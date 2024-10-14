@@ -556,7 +556,7 @@ BoxCollider:
   m_GameObject: {fileID: 360502885}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 0.6, y: 1, z: 1}
   m_Center: {x: -0.2, y: 0, z: 0}
@@ -2126,6 +2126,7 @@ MonoBehaviour:
   playerMaxMP: 1000
   playerMP: 300
   playerPower: 100
+  skillPower: 0
   playerArmor: 100
   moveSpeed: 5
   rigid: {fileID: 0}
@@ -2213,6 +2214,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1213933033}
     m_Modifications:
+    - target: {fileID: 100014, guid: 8f0565f23a2b58541a475bd3c1393052, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 100014, guid: 8f0565f23a2b58541a475bd3c1393052, type: 3}
+      propertyPath: m_TagString
+      value: PlayerAttackRange
+      objectReference: {fileID: 0}
+    - target: {fileID: 100074, guid: 8f0565f23a2b58541a475bd3c1393052, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 100074, guid: 8f0565f23a2b58541a475bd3c1393052, type: 3}
+      propertyPath: m_TagString
+      value: PlayerAttackRange
+      objectReference: {fileID: 0}
     - target: {fileID: 100326, guid: 8f0565f23a2b58541a475bd3c1393052, type: 3}
       propertyPath: m_Name
       value: unitychan
@@ -2390,7 +2407,7 @@ BoxCollider:
   m_GameObject: {fileID: 1273253952}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 0.6, y: 1, z: 1}
   m_Center: {x: -0.2, y: 0, z: 0}

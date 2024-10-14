@@ -8,7 +8,7 @@ using static InputKeyManager;
 public class Player : PlayerController
 {
     public delegate void PlayerHandle();
-    public static event PlayerHandle OnMove, OnDash, OnAttack, OnSkill, OnHit, OnDead;
+    public static event PlayerHandle OnMove, OnDash, OnAttack, OnMP, OnSkill, OnHit, OnDead;
 
     void Awake()
     {
@@ -24,9 +24,13 @@ public class Player : PlayerController
         OnMove += Move;
         OnDash += Dash;
         OnAttack += Attack;
+        OnMP += MPup;
         OnSkill += Skill;
         OnHit += Hit;
         OnDead += Dead;
+
+        // 기본 스킬 파워
+        skillPower = 1;
     }
 
     private void OnDisable()
@@ -34,6 +38,7 @@ public class Player : PlayerController
         OnMove -= Move;
         OnDash -= Dash;
         OnAttack -= Attack;
+        OnMP -= MPup;
         OnSkill -= Skill;
         OnHit -= Hit;
         OnDead -= Dead;
@@ -52,14 +57,26 @@ public class Player : PlayerController
 
     void Update()
     {
+        // 대시 ( 피하기 )
         if (Input.GetKey(inputKeyManager.GetKeyCode(KeyCodeTypes.Dash)) && !isDash) {
             OnDash?.Invoke();
         }
 
         // 공격
-        if(Input.GetKey(inputKeyManager.GetKeyCode(KeyCodeTypes.Attack)) && !isAttack && !animator.GetBool("IsDash")) {
+        if (Input.GetKey(inputKeyManager.GetKeyCode(KeyCodeTypes.Attack)) && !isAttack && !animator.GetBool("IsDash")) {
             OnMove -= Move;
+            RotateAttack();
             OnAttack?.Invoke();
+        }
+
+        // 마나 회복
+        if (isMpMax) {
+            if (PlayerMP >= playerMaxMP) return;
+            isMpMax = false;
+            OnMP += MPup;
+        } 
+        else {  
+            OnMP?.Invoke();
         }
 
         // 스킬 동작
@@ -84,6 +101,7 @@ public class Player : PlayerController
         else 
             navAgent.isStopped = true;
 
+        // 멈추면 애니메이션 변경 
         if(navAgent.isStopped == true) {
             animator.SetFloat("Speed", 0);
         }
@@ -91,7 +109,7 @@ public class Player : PlayerController
 
     private void OnCollisionEnter(Collision collision)
     {
-       
+        
     }
 
     public override void Move()
@@ -130,6 +148,23 @@ public class Player : PlayerController
         animator.SetBool("IsAttack", true);
         comboCount = 0;
         comdoAttack = StartCoroutine(ComboAttack());
+    }
+
+    private void RotateAttack()
+    {
+        // 마우스 위치를 화면 좌표에서 세계 좌표로 변환
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        // 마우스 위치에서 Raycast 수행
+        if (Physics.Raycast(ray, out hit)) {
+            Vector3 direction = (hit.point - transform.position).normalized; // 캐릭터 방향 계산
+            direction.y = 0; // y축 방향을 0으로 설정하여 수평 회전만 가능
+
+            // 회전
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, 1f);
+        }
     }
 
     IEnumerator ComboAttack()
@@ -181,6 +216,19 @@ public class Player : PlayerController
         animator.SetBool("IsCombo1", false);
         animator.SetBool("IsCombo2", false);
         comboCount = 0;
+    }
+
+    public override void MPup()
+    {
+        // 마나 회복
+        if (PlayerMP >= playerMaxMP) {
+            PlayerMP = playerMaxMP;
+            isMpMax = true;
+            OnMP -= MPup;
+        }
+        else {
+            PlayerMP += 10.0f * Time.deltaTime;
+        }
     }
 
     public override void Skill()

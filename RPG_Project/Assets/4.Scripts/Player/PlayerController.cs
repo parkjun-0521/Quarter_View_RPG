@@ -15,6 +15,10 @@ public abstract class PlayerController : MonoBehaviour, IController
             return playerHP;
         }
         set {
+            if(playerHP > playerMaxHP) {
+                playerHP = playerMaxHP;
+            }
+
             if (value < 0)
                 playerHP = 0;
             else
@@ -23,7 +27,20 @@ public abstract class PlayerController : MonoBehaviour, IController
     }
     public float playerMaxMP;                   // 플레이어 최대 마나
     public float playerMP;                      // 플레이어 남은 마나
+    public float PlayerMP
+    {
+        get {
+            return playerMP;
+        }
+        set {
+            if (value < 0)
+                playerMP = 0;
+            else
+                playerMP = value;
+        }
+    }
     public float playerPower;                   // 플레이어 힘 
+    public float skillPower;                    // 스킬 데미지
     public float playerArmor;                   // 플레이어 방어력
 
     [SerializeField]
@@ -31,6 +48,7 @@ public abstract class PlayerController : MonoBehaviour, IController
     protected bool isDash = false;              // 대시
     protected bool isAttack = false;            // 공격
     protected bool isSkill = false;             // 스킬 사용
+    protected bool isMpMax = false;
 
     // 연속 공격
     protected Coroutine comdoAttack;
@@ -50,6 +68,7 @@ public abstract class PlayerController : MonoBehaviour, IController
     public virtual void Dash() { }
     public abstract void Attack();
     public virtual void Skill() { }
+    public virtual void MPup() { }
     public abstract void Hit();
     public abstract void Dead();
 }

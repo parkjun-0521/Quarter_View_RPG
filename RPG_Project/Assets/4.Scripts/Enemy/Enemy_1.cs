@@ -16,7 +16,6 @@ public class Enemy_1 : EnemyController
     void Awake()
     {
         enemyRigid = GetComponent<Rigidbody>();
-        enemyCollider = GetComponent<CapsuleCollider>();
         animator = GetComponentInChildren<Animator>();
         enemyNavMeshAgent = GetComponent<NavMeshAgent>();
     }
@@ -29,6 +28,9 @@ public class Enemy_1 : EnemyController
         OnAttack += Attack;
         OnHit += Hit;
         OnDead += Dead;
+        
+        // 체력 초기화 
+        EnemyHP = enemyMaxHP;
     }
 
     private void OnDisable()
@@ -55,6 +57,9 @@ public class Enemy_1 : EnemyController
 
     void Update()
     {
+        if (isAttack) {
+            OnAttack?.Invoke();
+        }
         // 죽었을 때 
         if (EnemyHP <= 0) {
             OnDead?.Invoke();
@@ -63,7 +68,6 @@ public class Enemy_1 : EnemyController
 
     void FixedUpdate()
     {
-
         if (targetObj != null) {
             OnTracking?.Invoke();   // 추적
         }
@@ -90,6 +94,8 @@ public class Enemy_1 : EnemyController
                 detectionRange.SetActive(false);
                 // 추적 오브젝트 초기화
                 targetObj = null;
+                // 추격 취소
+                isDetection = false;
                 // 추격할 대상이 사라지면 추적 종료 
                 OnTracking -= Tracking;
 
@@ -164,6 +170,14 @@ public class Enemy_1 : EnemyController
         else {
             // 가까워지면 이동 멈춤 및 애니메이션 상태 변경 (필요 시)
             animator.SetBool("IsRun", false);
+            animator.SetBool("IsWalk", false);
+
+            // 방향 탐색 
+            Vector3 direction = (targetObj.transform.position - transform.position).normalized;
+
+            // 적이 플레이어를 바라보도록 회전
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime);
         }
     }
 
@@ -171,9 +185,15 @@ public class Enemy_1 : EnemyController
     {
         // 플레이어가 범위에 닿을 시 타겟을 플레이어로 지정 
         if (other != null) {
-            if (other.gameObject.CompareTag("Player")) {
+            if (isDetection) {
                 enemyNavMeshAgent.isStopped = true;
-                targetObj = other.gameObject;
+            }
+
+            if (other.gameObject.CompareTag("PlayerAttackRange")) {
+                float playerAttackPower = other.gameObject.transform.parent.GetComponentInParent<Player>().playerPower;
+                float playerSkillPower = other.gameObject.transform.parent.GetComponentInParent<Player>().skillPower;
+
+                EnemyHP -= playerAttackPower * playerSkillPower;
             }
         }
     }
@@ -181,7 +201,12 @@ public class Enemy_1 : EnemyController
     public override void Attack()
     {
         // 플레이어를 추격하고 있는 상태에서 
-        // 플레이어가 공격 범위에 들어오면 공격 ( 추적하는 플레이어 정보로 거리 측정 )
+        // 플레이어가 공격 범위에 들어오면 공격 ( 추적하는 플레이어 정보로 거리 측정 )   
+        attackCurDelay += Time.deltaTime;
+        if(attackCurDelay >= attackMaxDelay) {
+            animator.SetBool("IsAttack", true);
+            attackCurDelay = 0;
+        }
     }
 
     public override void Hit()

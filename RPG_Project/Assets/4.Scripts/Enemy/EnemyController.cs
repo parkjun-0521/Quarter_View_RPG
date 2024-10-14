@@ -28,10 +28,16 @@ public abstract class EnemyController : MonoBehaviour, IController
     }
 
     [SerializeField]
-    protected GameObject targetObj;     // 추적할 오브젝트 
+    protected float attackMaxDelay = 2f;
+    [SerializeField]
+    protected float attackCurDelay;
+
+    [SerializeField]
+    public GameObject targetObj;     // 추적할 오브젝트 
 
     public Vector3 spawnPosition;       // 생성될 위치
 
+    [Header("순회하는 거리")]
     public float circuitRange;          // 순회 하는 범위 
     protected float maxPosX;            // X 좌표 순회 범위 
     protected float minPosX;            // -X 좌표 순회 범위 
@@ -39,11 +45,10 @@ public abstract class EnemyController : MonoBehaviour, IController
     protected float minPosZ;            // -Z 좌표 순회 범위 
     public float tolerance = 0.5f;      // 원점 도착 오차범위 
     protected bool isZero = false;
-
-    protected bool isAttack;            
+    public bool isDetection = false;    // 범위에 닿을 시 추격
+    public bool isAttack = false;       // 공격 범위에 닿았을 때             
 
     public Rigidbody enemyRigid;
-    public CapsuleCollider enemyCollider;
     public Animator animator;
     public NavMeshAgent enemyNavMeshAgent;
 

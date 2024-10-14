@@ -9,6 +9,7 @@ TagManager:
   - InputKeyManager
   - UI
   - Enemy
+  - PlayerAttackRange
   layers:
   - Default
   - TransparentFX
@@ -21,6 +22,7 @@ TagManager:
   - 
   - 
   - Player
+  - PlayerAttackRange
   - 
   - 
   - 
@@ -29,9 +31,8 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
+  - EnemyDetectionCollider
+  - EnemyAttackCollider
   - 
   - 
   - 
