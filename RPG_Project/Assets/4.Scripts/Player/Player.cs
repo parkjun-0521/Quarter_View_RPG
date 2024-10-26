@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -125,7 +126,15 @@ public class Player : PlayerController
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit)) {
             navAgent.SetDestination(hit.point);
-            animator.SetFloat("Speed", 1);
+            navAgent.updateRotation = true;
+        }
+
+        if (navAgent.remainingDistance > navAgent.stoppingDistance) {
+            animator.SetFloat("Speed", 1); // 이동 중일 때 애니메이션 속도 설정
+        }
+        else {
+            animator.SetFloat("Speed", 0); // 목적지에 도착하면 애니메이션 멈춤
+            navAgent.updateRotation = true;
         }
     }
 
@@ -323,6 +332,7 @@ public class Player : PlayerController
     {
         // 체력이 0보다 작을 때 사망
         animator.SetTrigger("OnDead");
+        gameObject.tag = "DeadPlayer";
         OnMove -= Move;
         OnDash -= Dash;
         OnAttack -= Attack;

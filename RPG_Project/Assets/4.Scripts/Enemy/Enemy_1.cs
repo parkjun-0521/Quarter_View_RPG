@@ -66,7 +66,7 @@ public class Enemy_1 : EnemyController
         // 죽었을 때 
         if (EnemyHP <= 0) {
             OnDead?.Invoke();
-        }
+        } 
     }
 
     void FixedUpdate()
@@ -201,15 +201,38 @@ public class Enemy_1 : EnemyController
     public override void Attack()
     {
         // 플레이어를 추격하고 있는 상태에서 
-        // 플레이어가 공격 범위에 들어오면 공격 ( 추적하는 플레이어 정보로 거리 측정 )   
+        // 플레이어가 공격 범위에 들어오면 공격 ( 추적하는 플레이어 정보로 거리 측정 )
         attackCurDelay += Time.deltaTime;
         if(attackCurDelay >= attackMaxDelay) {
-            OnMove -= Move;
-            OnTracking -= Tracking;
-            transform.LookAt(targetObj.transform);
-            animator.SetBool("IsAttack", true);
-            attackCurDelay = 0;
-            StartCoroutine(AttackExit());
+            if (targetObj.GetComponent<Player>().PlayerHP <= 0) {
+                isAttack = false;
+                enemyNavMeshAgent.isStopped = false;
+
+                // 스폰 위치로 걸어가는 기능 
+                if (enemyNavMeshAgent.destination != spawnPosition) {
+                    // 플레이어 탐지 비활성화 
+                    detectionRange.SetActive(false);
+                    // 추적 오브젝트 초기화
+                    targetObj = null;
+                    // 추격 취소
+                    isDetection = false;
+                    // 추격할 대상이 사라지면 추적 종료 
+                    OnTracking -= Tracking;
+
+                    enemyNavMeshAgent.SetDestination(spawnPosition);
+                    transform.rotation = Quaternion.LookRotation(spawnPosition);
+                    enemyRigid.constraints = RigidbodyConstraints.FreezeAll;
+                    animator.SetBool("IsRun", false);
+                    animator.SetBool("IsWalk", true);
+                }
+            }
+            else {
+                OnMove -= Move;
+                OnTracking -= Tracking;
+                animator.SetBool("IsAttack", true);
+                attackCurDelay = 0;
+                StartCoroutine(AttackExit());
+            }
         }
     }
 
