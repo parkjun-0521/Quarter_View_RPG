@@ -8,7 +8,10 @@ using static InputKeyManager;
 public class Player : PlayerController
 {
     public delegate void PlayerHandle();
-    public static event PlayerHandle OnMove, OnDash, OnAttack, OnMP, OnSkill, OnHit, OnDead;
+    public static event PlayerHandle OnMove, OnDash, OnAttack, OnMP, OnSkill, OnDead;
+
+    public delegate void PlayerHitHandle(Collider other);
+    public static event PlayerHitHandle OnHit;
 
     void Awake()
     {
@@ -48,8 +51,8 @@ public class Player : PlayerController
     {    
         // 나중에 장착하고 있는 장비의 초기값을 주면 됨 
         playerMaxHP = 10000;                      
-        playerMaxMP = 1000;                      
-        playerPower = 100;                   
+        playerMaxMP = 5000;                      
+        playerPower = 500;                   
         playerArmor = 100;      
         
         Debug.Log(PlayerHP + "  " + playerMP + "  " + playerPower + "  " + playerArmor);
@@ -107,9 +110,13 @@ public class Player : PlayerController
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        
+        if(other != null) {
+            if (other.gameObject.CompareTag("EnemyAttackRange")) {
+                OnHit?.Invoke(other);
+            }
+        }
     }
 
     public override void Move()
@@ -297,9 +304,19 @@ public class Player : PlayerController
         }
     }
 
-    public override void Hit()
+    public override void Hit(Collider other)
     {
+        // 몬스터 한테 맞을 때 
+        Debug.Log("맞았습니다. 체력 감소");
+        PlayerHP -= other.gameObject.transform.parent.GetComponentInParent<EnemyController>().enemyPower;
+        StartCoroutine(HitEffect());
+    }
 
+    IEnumerator HitEffect()
+    {
+        hitImage.gameObject.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        hitImage.gameObject.SetActive(false);
     }
 
     public override void Dead()

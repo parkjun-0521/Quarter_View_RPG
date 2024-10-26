@@ -10,7 +10,10 @@ using static UnityEngine.GraphicsBuffer;
 public class Enemy_1 : EnemyController
 {
     public delegate void EnemyHandle();
-    public static event EnemyHandle OnMove, OnResetPos, OnTracking, OnAttack, OnHit, OnDead;
+    public static event EnemyHandle OnMove, OnResetPos, OnTracking, OnAttack, OnDead;
+
+    public delegate void EnemyHitHandle(Collider other);
+    public static event EnemyHitHandle OnHit;
 
 
     void Awake()
@@ -165,7 +168,7 @@ public class Enemy_1 : EnemyController
 
             // 적이 플레이어를 바라보도록 회전
             Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime);
+            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime);
         }
         else {
             // 가까워지면 이동 멈춤 및 애니메이션 상태 변경 (필요 시)
@@ -177,7 +180,7 @@ public class Enemy_1 : EnemyController
 
             // 적이 플레이어를 바라보도록 회전
             Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime);
+            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime);
         }
     }
 
@@ -190,10 +193,7 @@ public class Enemy_1 : EnemyController
             }
 
             if (other.gameObject.CompareTag("PlayerAttackRange")) {
-                float playerAttackPower = other.gameObject.transform.parent.GetComponentInParent<Player>().playerPower;
-                float playerSkillPower = other.gameObject.transform.parent.GetComponentInParent<Player>().skillPower;
-
-                EnemyHP -= playerAttackPower * playerSkillPower;
+                OnHit?.Invoke(other);
             }
         }
     }
@@ -204,13 +204,32 @@ public class Enemy_1 : EnemyController
         // 플레이어가 공격 범위에 들어오면 공격 ( 추적하는 플레이어 정보로 거리 측정 )   
         attackCurDelay += Time.deltaTime;
         if(attackCurDelay >= attackMaxDelay) {
+            OnMove -= Move;
+            OnTracking -= Tracking;
+            transform.LookAt(targetObj.transform);
             animator.SetBool("IsAttack", true);
             attackCurDelay = 0;
+            StartCoroutine(AttackExit());
         }
     }
 
-    public override void Hit()
+    IEnumerator AttackExit()
     {
+        yield return new WaitForSeconds(1.5f);
+        if (animator.GetBool("IsAttack")) {
+            OnMove += Move;
+            OnTracking += Tracking;
+            animator.SetBool("IsAttack", false);
+        }
+    }
+
+    public override void Hit(Collider other)
+    {
+        float playerAttackPower = other.gameObject.transform.parent.GetComponentInParent<Player>().playerPower;
+        float playerSkillPower = other.gameObject.transform.parent.GetComponentInParent<Player>().skillPower;
+
+        // 체력 감소 
+        EnemyHP -= playerAttackPower * playerSkillPower;
         // 공격을 받을 시 hit 애니메이션 동작 
     }
 

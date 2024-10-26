@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public abstract class PlayerController : MonoBehaviour, IController
 {
@@ -63,12 +64,13 @@ public abstract class PlayerController : MonoBehaviour, IController
     [HideInInspector]
     public CapsuleCollider capsuleCollider;     // collider ÄÄÆ÷³ÍÆ® 
     protected Animator animator;                // animator ÄÄÆ÷³ÍÆ®
+    public Image hitImage; 
 
     public abstract void Move();
     public virtual void Dash() { }
     public abstract void Attack();
     public virtual void Skill() { }
     public virtual void MPup() { }
-    public abstract void Hit();
+    public abstract void Hit(Collider other);
     public abstract void Dead();
 }

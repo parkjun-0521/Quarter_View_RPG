@@ -8,10 +8,10 @@ public abstract class EnemyController : MonoBehaviour, IController
     [SerializeField]
     protected float enemyMoveSpeed;     // 적 이동 속도 
     [SerializeField]
-    protected float enemyPower;         // 적 힘 
+    public float enemyPower;         // 적 힘 
 
     [SerializeField]
-    protected float enemyMaxHP;         // 적 최대 체력
+    public float enemyMaxHP;         // 적 최대 체력
     [SerializeField]
     private float enemyHP;              // 적 현재 체력
     public float EnemyHP                // 현재 체력 프로퍼티          
@@ -58,6 +58,6 @@ public abstract class EnemyController : MonoBehaviour, IController
     public virtual void Tracking() { }        // 적 추격
     public virtual void ResetPosition() { }   // 원점 이동
     public abstract void Attack();            // 적 공격 
-    public abstract void Hit();               // 적 피격 
+    public abstract void Hit(Collider other); // 적 피격 
     public abstract void Dead();              // 적 사망
 }
